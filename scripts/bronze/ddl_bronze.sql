@@ -1,73 +1,59 @@
--- Inserting the data to corresponding Tables
+--Creating Tables
 
-Create or alter procedure bronze.load_bronze as 
-begin
-	declare @start_time datetime, @end_time datetime;
-	begin try
-		print 'Loading Bronze Layer';
-		-- for each table do this -----
-		set @start_time = GETDATE(); 
-		truncate table bronze.erp_px_cat_g1v2
-		bulk insert bronze.erp_px_cat_g1v2
-		from 'C:\source_erp\px_cat_g1v2.csv'
-		with (
-			firstrow = 2, 
-			fieldterminator = ',',
-			tablock
-		
-			);
-		set @end_time = GETDATE();
-		print '>> Load Duration: ' + cast(datediff(second, @start_time, @end_time)as nvarchar)+ 'seconds'
-		truncate table bronze.erp_loc_a101
-		bulk insert bronze.erp_loc_a101
-		from 'C:\source_erp\loc_a101.csv'
-		with (
-			firstrow = 2, 
-			fieldterminator = ',',
-			tablock
+if OBJECT_ID ('bronze.crm_cust_info', 'U') is not null
+	drop table bronze.crm_cust_info
 
-			);
-		truncate table bronze.erp_cust_az12
-		bulk insert bronze.erp_cust_az12
-		from 'C:\source_erp\cust_az12.csv'
-		with (
-			firstrow = 2, 
-			fieldterminator = ',',
-			tablock
-	
-			);
-		truncate table bronze.crm_cust_info
-		bulk insert bronze.crm_cust_info
-		from 'C:\source_crm\cust_info.csv'
-		with (
-			firstrow = 2, 
-			fieldterminator = ',',
-			tablock
-	
-			);
+create table bronze.crm_cust_info(
+cst_id int,
+cst_key nvarchar(50),
+cst_firstname nvarchar(50),
+cst_lastname nvarchar(50),
+cst_mater_status nvarchar(50),
+cst_gndr nvarchar(50),
+cst_create_date date
 
-		truncate table bronze.crm_prd_info
-		bulk insert bronze.crm_prd_info
-		from 'C:\source_crm\prd_info.csv'
-		with (
-			firstrow = 2, 
-			fieldterminator = ',',
-			tablock
-	
-			);
-		truncate table bronze.crm_sales_details
-		bulk insert bronze.crm_sales_details
-		from 'C:\source_crm\sales_details.csv'
-		with (
-			firstrow = 2, 
-			fieldterminator = ',',
-			tablock
-	
-			);
-		end try
+);
 
-		begin catch
-		end catch
-end
+create table bronze.crm_prd_info (
 
+prd_id int,
+prd_key nvarchar(50),
+prd_nm nvarchar(50),
+prd_cost int,
+prd_line nvarchar(50),
+prd_start_dt date,
+prd_end_dt date
 
+)
+if OBJECT_ID ('bronze.crm_sales_details', 'U') is not null
+	drop table bronze.crm_sales_details
+create table bronze.crm_sales_details (
+sls_ord_num nvarchar(50),
+sls_prd_key nvarchar(50),
+sls_cust_id int,
+sls_order_dt int,
+sls_ship_dt int,
+sls_due_dt int,
+sls_sales int,
+sls_quantity int,
+sls_price int
+
+)
+
+create table bronze.erp_px_cat_g1v2(
+ID nvarchar(50),
+cat nvarchar(50),
+subcat nvarchar(50),
+maintenance nvarchar(50)
+)
+
+create table bronze.erp_cust_az12(
+cid nvarchar(50),
+bdate date,
+gen nvarchar(50)
+)
+
+create table bronze.erp_loc_a101(
+cid nvarchar(50),
+cntry nvarchar(50)
+)
